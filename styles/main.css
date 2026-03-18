@@ -1,141 +1,64 @@
 body, html {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden; /* Evita scroll de la página */
+    margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #111; /* Fondo oscuro para resaltar el 3D */
-    color: #eee;
+    background-color: #0d1117; color: #c9d1d9; /* Tema Oscuro profesional */
 }
 
-/* Contenedor de la escena 3D */
-#scene-container {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1; /* Fondo */
+.simulation-dashboard {
+    display: flex; width: 100%; height: 100%;
 }
 
-/* Superposiciones (Overlays) */
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.85); /* Fondo semi-transparente */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10; /* Por encima de todo */
-    opacity: 1;
-    transition: opacity 0.3s ease;
+/* PANELES LATERALES (TIPO image_3.png) */
+.left-panel, .right-panel {
+    width: 300px; padding: 20px;
+    background-color: #161b22; border-right: 1px solid #30363d;
+    display: flex; flex-direction: column;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+    z-index: 10;
 }
 
-.overlay.hidden {
-    display: none;
-    opacity: 0;
-    pointer-events: none;
+.right-panel { border-right: none; border-left: 1px solid #30363d; }
+
+.center-panel { flex: 1; position: relative; }
+
+#scene-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+
+/* TIPOGRAFÍA */
+h3 { border-bottom: 2px solid #00bcd4; padding-bottom: 10px; color: #fff; text-align: center; font-size: 1.1rem; letter-spacing: 1px;}
+h4 { color: #00bcd4; margin-top: 20px; }
+
+.controls-info p { margin: 10px 0; font-size: 14px; }
+.controls-info strong { color: #fff; }
+.explorer-content p { font-size: 14px; color: #8b949e; line-height: 1.6; }
+
+/* TECLADO NUMÉRICO (Grid tipo image_3.png) */
+.numeric-keypad {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: auto;
+    background-color: #0d1117; padding: 15px; border-radius: 8px; border: 1px solid #30363d;
 }
 
-.overlay-content {
-    background-color: #222;
-    padding: 30px;
-    border-radius: 12px;
-    width: 85%;
-    max-width: 900px;
-    max-height: 80vh;
-    overflow-y: auto; /* Scroll si el contenido es muy largo */
-    position: relative;
-    border: 1px solid #444;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+.key {
+    background-color: #21262d; border: 1px solid #30363d; color: #c9d1d9;
+    font-size: 1.2rem; font-weight: bold; padding: 15px; border-radius: 6px;
+    cursor: pointer; transition: all 0.2s;
 }
 
-.close-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    color: #888;
-    font-size: 28px;
-    cursor: pointer;
-}
+.key:hover { background-color: #30363d; transform: translateY(-1px); }
+.key.active { background-color: #1e3a38; border-color: #80cbc4; color: #fff; box-shadow: 0 0 10px rgba(128,203,196,0.3); }
+.key[data-target="r"] { grid-column: span 3; background-color: #1a2a4a; border-color: #2a3a5a; }
+.key[data-target="r"]:hover { background-color: #2a3a5a; }
 
-.close-btn:hover {
-    color: #fff;
-}
+/* OVERLAY (Presupuesto / Novedad) */
+.overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 20; display: flex; justify-content: center; align-items: center; opacity: 1; transition: opacity 0.3s; }
+.overlay.hidden { display: none; opacity: 0; pointer-events: none; }
+.overlay-content { background-color: #161b22; padding: 40px; border-radius: 12px; border: 1px solid #30363d; max-width: 800px; max-height: 80vh; overflow-y: auto; position: relative; }
+.close-btn { position: absolute; top: 15px; right: 20px; background: none; border: none; color: #8b949e; font-size: 28px; cursor: pointer; }
+.close-btn:hover { color: #fff; }
 
-h2 {
-    border-bottom: 2px solid #00bcd4;
-    padding-bottom: 10px;
-    margin-top: 0;
-    color: #00bcd4;
-}
-
-/* Estilos de la tabla de componentes */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    font-size: 0.9em;
-}
-
-th, td {
-    text-align: left;
-    padding: 12px;
-    border-bottom: 1px solid #333;
-}
-
-th {
-    background-color: #333;
-    color: #00bcd4;
-}
-
-td:nth-child(2), td:nth-child(3), td:nth-child(4) {
-    text-align: center;
-}
-
-.total-cost {
-    text-align: right;
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-top: 20px;
-    color: #00bcd4;
-}
-
-/* Texto de novedad */
-#novelty-text {
-    line-height: 1.6;
-    color: #ccc;
-}
-
-#novelty-text p {
-    margin-bottom: 15px;
-}
-
-#novelty-text ul {
-    margin-left: 20px;
-    margin-bottom: 15px;
-}
-
-/* Ayuda de controles */
-#controls-help {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 15px;
-    border-radius: 8px;
-    z-index: 5;
-    pointer-events: none; /* No interfiere con el mouse en el 3D */
-    font-size: 0.85em;
-    border: 1px solid #333;
-}
-
-#controls-help p {
-    margin: 4px 0;
-}
+/* Estilo de la tabla de Presupuesto */
+#overlay-body table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; color: #eee;}
+#overlay-body th, #overlay-body td { text-align: left; padding: 12px; border-bottom: 1px solid #30363d; }
+#overlay-body th { color: #00bcd4; }
+#overlay-body .total-cost { text-align: right; font-size: 1.2rem; font-weight: bold; color: #00bcd4; margin-top: 20px;}
+#overlay-body ul { color: #ccc; line-height: 1.7; }
+#overlay-body h3 { text-align: left; border-bottom: none; }
