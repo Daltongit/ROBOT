@@ -1,141 +1,246 @@
-// js/main.js
-import { initThreeJS, animateThreeJS, setViewModel } from './modelView.js';
-import { componentsData, noveltyTextHTML } from './data.js';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { budgetData, noveltyText, explorerData } from './data.js';
 
-// Esperar a que el DOM esté completamente cargado
+let scene, camera, renderer, controls;
+let robotGroup;
+let environmentMap;
+
+const views = {
+    'r': { pos: new THREE.Vector3(8, 6, 8), target: new THREE.Vector3(0, 0, 0) },
+    '1': { pos: new THREE.Vector3(0, 0, 6), target: new THREE.Vector3(0, 0, 0) },
+    '2': { pos: new THREE.Vector3(0, 4, 3), target: new THREE.Vector3(0, 1.2, 0) },
+    '3': { pos: new THREE.Vector3(-4, -4, 0), target: new THREE.Vector3(0, -1.8, 0) },
+    '4': { pos: new THREE.Vector3(0, 1.5, 4), target: new THREE.Vector3(0, 0, 0.5) },
+    '5': { pos: new THREE.Vector3(-3, 1, -2), target: new THREE.Vector3(0, 0, 0) },
+    '6': { pos: new THREE.Vector3(3, 1.5, 2), target: new THREE.Vector3(0, 0, 0) },
+    '7': { pos: new THREE.Vector3(3, -1.5, 2), target: new THREE.Vector3(0, 0, 0) },
+    '8': { pos: new THREE.Vector3(0, -3, -5), target: new THREE.Vector3(0, -0.3, 0) }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Inicializar el entorno 3D de Three.js
     initThreeJS();
-    // 2. Iniciar el ciclo de animación (game loop)
-    animateThreeJS();
-
-    // 3. Inicializar las Interfaces de Usuario (Overlays)
-    initOverlays();
-
-    // 4. Inicializar el manejo del teclado para controles
-    initKeyboardControls();
+    setupDashboardUI();
+    animate();
 });
 
-// --- Lógica de las Superposiciones (Overlays) ---
-function initOverlays() {
-    const componentListOverlay = document.getElementById('component-list-overlay');
-    const noveltyOverlay = document.getElementById('novelty-overlay');
+function initThreeJS() {
+    const container = document.getElementById('scene-container');
+    if (!container) return;
+    
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0d1117);
+    scene.fog = new THREE.FogExp2(0x0d1117, 0.03);
 
-    // Manejar botones de cerrar
-    document.getElementById('close-components').addEventListener('click', () => {
-        componentListOverlay.classList.add('hidden');
-    });
-    document.getElementById('close-novelty').addEventListener('click', () => {
-        noveltyOverlay.classList.add('hidden');
-    });
+    const aspect = container.clientWidth / container.clientHeight;
+    camera = new THREE.PerspectiveCamera(60, aspect, 0.1, 1000);
+    camera.position.copy(views['r'].pos);
 
-    // Cerrar con ESC
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            componentListOverlay.classList.add('hidden');
-            noveltyOverlay.classList.add('hidden');
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    container.appendChild(renderer.domElement);
+
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.target.copy(views['r'].target);
+
+    // Sistema de Luces
+    scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    dirLight.position.set(5, 10, 7.5);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 1024;
+    dirLight.shadow.mapSize.height = 1024;
+    scene.add(dirLight);
+
+    const accentLight = new THREE.PointLight(0xffcc00, 0.6);
+    accentLight.position.set(-5, -5, 5);
+    scene.add(accentLight);
+
+    // Entorno de reflejos (Carga de texturas nativas de ThreeJS)
+    new THREE.CubeTextureLoader()
+        .setPath('https://threejs.org/examples/textures/cube/pisa/') 
+        .load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'], (texture) => {
+            environmentMap = texture;
+            environmentMap.mapping = THREE.CubeReflectionMapping;
+            scene.environment = environmentMap;
+            buildRobot(true);
+        }, undefined, () => buildRobot(false));
+
+    window.addEventListener('resize', () => {
+        if (!container || !renderer) return;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+}
+
+function buildRobot(hasEnvMap) {
+    if(scene.getObjectByName('robotModel')) {
+        scene.remove(scene.getObjectByName('robotModel'));
+    }
+
+    robotGroup = new THREE.Group();
+    robotGroup.name = 'robotModel';
+    scene.add(robotGroup);
+
+    // 1. Esfera Acrílico (MeshPhysicalMaterial)
+    const sphereGeo = new THREE.SphereGeometry(3.5, 64, 64);
+    const sphereMat = new THREE.MeshPhysicalMaterial({
+        color: 0xffffff, transmission: 1, opacity: 1, metalness: 0, roughness: 0.05,
+        ior: 1.5, thickness: 0.1, clearcoat: 1, clearcoatRoughness: 0,
+        envMap: hasEnvMap ? environmentMap : null, envMapIntensity: 1
+    });
+    const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+    sphere.castShadow = true; sphere.receiveShadow = true;
+    robotGroup.add(sphere);
+
+    // 2. Chasis Principal PCB
+    const chasisGeo = new THREE.CylinderGeometry(3.1, 3.1, 0.1, 32);
+    const chasisMat = new THREE.MeshStandardMaterial({ color: 0x003300, roughness: 1, metalness: 0.1 });
+    const chasisPCB = new THREE.Mesh(chasisGeo, chasisMat);
+    chasisPCB.rotation.x = Math.PI / 2; chasisPCB.position.z = -0.2; chasisPCB.castShadow = true;
+    robotGroup.add(chasisPCB);
+
+    // 3. Motores
+    const motorGeo = new THREE.CylinderGeometry(0.5, 0.5, 2, 32);
+    const motorMat = new THREE.MeshStandardMaterial({ color: 0xcfb53b, metalness: 1, roughness: 0.3, envMapIntensity: 1 });
+    const motorL = new THREE.Mesh(motorGeo, motorMat);
+    motorL.position.set(-2, 0, 0); motorL.rotation.z = Math.PI / 2; motorL.castShadow = true;
+    robotGroup.add(motorL);
+    const motorR = motorL.clone(); motorR.position.set(2, 0, 0);
+    robotGroup.add(motorR);
+
+    // 4. ESP32-CAM y Lente
+    const espPCBGeom = new THREE.BoxGeometry(1.2, 0.1, 1.8);
+    const espPCBMat = new THREE.MeshStandardMaterial({ color: 0x005500, roughness: 0.9 });
+    const espPCB = new THREE.Mesh(espPCBGeom, espPCBMat);
+    espPCB.position.set(0, 1.2, 0.1); espPCB.castShadow = true;
+    robotGroup.add(espPCB);
+    const lensGeom = new THREE.CylinderGeometry(0.2, 0.2, 0.1, 32);
+    const lensMat = new THREE.MeshPhysicalMaterial({ color: 0x050505, metalness: 0.9, roughness: 0.1, ior: 2 });
+    const lens = new THREE.Mesh(lensGeom, lensMat);
+    lens.position.set(0, 1.2, 0.35); lens.rotation.x = Math.PI / 2;
+    robotGroup.add(lens);
+
+    // 5. Baterías
+    const batGeom = new THREE.CylinderGeometry(0.45, 0.45, 1.8, 32);
+    const batMat = new THREE.MeshStandardMaterial({ color: 0x1e90ff, metalness: 0.8, roughness: 0.2, envMapIntensity: 0.8 });
+    const bat1 = new THREE.Mesh(batGeom, batMat);
+    bat1.position.set(0.6, -1.8, -0.3); bat1.rotation.z = Math.PI / 2; bat1.castShadow = true;
+    robotGroup.add(bat1);
+    const bat2 = bat1.clone(); bat2.position.set(-0.6, -1.8, -0.3);
+    robotGroup.add(bat2);
+
+    // 6. Sensor Ultrasonico
+    const ultraGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.2, 32);
+    const ultraMat = new THREE.MeshStandardMaterial({ color: 0xb0c4de, metalness: 0.9, roughness: 0.4 });
+    const eyeL = new THREE.Mesh(ultraGeo, ultraMat);
+    eyeL.position.set(-0.5, 0, 0.35); eyeL.rotation.x = Math.PI / 2;
+    robotGroup.add(eyeL);
+    const eyeR = eyeL.clone(); eyeR.position.set(0.5, 0, 0.35);
+    robotGroup.add(eyeR);
+
+    // 7. Componentes menores (Sonido, LDR, LED)
+    const soundGeo = new THREE.BoxGeometry(0.5, 0.5, 0.2);
+    const soundMat = new THREE.MeshStandardMaterial({ color: 0x8b0000, roughness: 0.8 });
+    const soundMod = new THREE.Mesh(soundGeo, soundMat);
+    soundMod.position.set(-2, 0.8, 0); robotGroup.add(soundMod);
+
+    const ldrGeo = new THREE.SphereGeometry(0.1, 16, 16);
+    const ldrMat = new THREE.MeshStandardMaterial({ color: 0xffd700, roughness: 0.2 });
+    const ldr = new THREE.Mesh(ldrGeo, ldrMat);
+    ldr.position.set(2.2, 1.2, 0.1); robotGroup.add(ldr);
+
+    const ledGeo = new THREE.BoxGeometry(0.15, 0.15, 0.3);
+    const ledMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const led = new THREE.Mesh(ledGeo, ledMat);
+    led.position.set(2.2, -1.2, 0.1); robotGroup.add(led);
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+}
+
+function setupDashboardUI() {
+    const keys = document.querySelectorAll('.key');
+    const infoTitle = document.getElementById('info-title');
+    const infoDesc = document.getElementById('info-desc');
+    const overlay = document.getElementById('overlay');
+    const overlayBody = document.getElementById('overlay-body');
+    const closeBtn = document.getElementById('close-overlay');
+
+    const changeView = (key) => {
+        const dataKey = key.toLowerCase();
+        
+        keys.forEach(k => k.classList.remove('active'));
+        const targetBtn = document.querySelector(`.key[data-target="${dataKey}"]`);
+        if(targetBtn) targetBtn.classList.add('active');
+
+        if(explorerData[dataKey]) {
+            infoTitle.textContent = explorerData[dataKey].title;
+            infoDesc.textContent = explorerData[dataKey].desc;
         }
+
+        if(views[dataKey]) {
+            camera.position.copy(views[dataKey].pos);
+            controls.target.copy(views[dataKey].target);
+            controls.update();
+        }
+        overlay.classList.add('hidden');
+    };
+
+    keys.forEach(key => {
+        key.addEventListener('click', (e) => changeView(e.target.getAttribute('data-target')));
     });
 
-    // Cargar los datos en los overlays desde js/data.js
-    populateComponentTable();
-    populateNoveltyText();
-}
-
-// --- Generar la tabla de componentes dinámicamente desde js/data.js ---
-function populateComponentTable() {
-    const tableContainer = document.getElementById('components-table-container');
-    const totalCostValue = document.getElementById('total-cost-value');
-
-    // Crear la estructura de la tabla HTML
-    let tableHTML = `
-        <table>
-            <thead>
-                <tr>
-                    <th>Componente</th>
-                    <th>Cantidad</th>
-                    <th>Precio</th>
-                    <th>Total</th>
-                    <th>Función (Extraído de Imagen 6)</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    // Llenar las filas con los datos transcritos
-    componentsData.items.forEach(item => {
-        tableHTML += `
-            <tr>
-                <td>${item.componente}</td>
-                <td>${item.cantidad}</td>
-                <td>${item.precio}</td>
-                <td>${item.total}</td>
-                <td>${item.funcion}</td>
-            </tr>
-        `;
-    });
-
-    tableHTML += `
-            </tbody>
-        </table>
-    `;
-
-    // Insertar la tabla en el contenedor del DOM
-    tableContainer.innerHTML = tableHTML;
-    // Actualizar el costo total
-    totalCostValue.textContent = componentsData.total;
-}
-
-// --- Cargar el texto de novedad desde js/data.js ---
-function populateNoveltyText() {
-    const noveltyTextContainer = document.getElementById('novelty-text');
-    noveltyTextContainer.innerHTML = noveltyTextHTML;
-}
-
-// --- Manejo del teclado para controles de vista e interfaz ---
-function initKeyboardControls() {
     document.addEventListener('keydown', (event) => {
         const key = event.key.toLowerCase();
-
-        // Ocultar overlays si se presiona cualquier tecla de control
-        if (['1', '2', '3', '4', '5', '6', '7', '8', 'r', '9', 'f'].includes(key)) {
-            document.querySelectorAll('.overlay').forEach(el => el.classList.add('hidden'));
-        }
-
-        switch (key) {
-            case 'r': // Reiniciar Vista Completa
-                setViewModel('full');
-                break;
-            case '1': // Motores
-                setViewModel('motors');
-                break;
-            case '2': // ESP32-CAM
-                setViewModel('esp32');
-                break;
-            case '3': // Baterías
-                setViewModel('batteries');
-                break;
-            case '4': // Ultrasonico
-                setViewModel('ultrasonic');
-                break;
-            case '5': // Sonido
-                setViewModel('sound');
-                break;
-            case '6': // LDRs
-                setViewModel('ldrs');
-                break;
-            case '7': // LEDs
-                setViewModel('led');
-                break;
-            case '8': // Otros
-                setViewModel('others');
-                break;
-            case '9': // Ver Presupuesto (Overlay)
-                document.getElementById('component-list-overlay').classList.remove('hidden');
-                break;
-            case 'f': // Ver Novedad (Overlay)
-                document.getElementById('novelty-overlay').classList.remove('hidden');
-                break;
+        if(['1','2','3','4','5','6','7','8','r'].includes(key)) {
+            changeView(key);
+        } else if(key === '9') {
+            showBudgetOverlay();
+        } else if(key === 'f') {
+            showNoveltyOverlay();
+        } else if(key === 'escape') {
+            overlay.classList.add('hidden');
         }
     });
+
+    closeBtn.addEventListener('click', () => overlay.classList.add('hidden'));
+
+    function showBudgetOverlay() {
+        let tableHTML = `
+            <h3>Componentes y Presupuesto</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Componente</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unit.</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        budgetData.items.forEach(item => {
+            tableHTML += `<tr><td>${item.item}</td><td>${item.qty}</td><td>${item.cost}</td><td>${item.total}</td></tr>`;
+        });
+        tableHTML += `</tbody></table><div class="total-cost">Total Estimado: ${budgetData.total}</div>`;
+        overlayBody.innerHTML = tableHTML;
+        overlay.classList.remove('hidden');
+    }
+
+    function showNoveltyOverlay() {
+        overlayBody.innerHTML = noveltyText;
+        overlay.classList.remove('hidden');
+    }
 }
