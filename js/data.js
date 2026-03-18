@@ -21,23 +21,24 @@ export const budgetData = {
 };
 
 export const noveltyText = `
-    <h3>¿Por qué es novedosa esta idea?</h3>
-    <p>La novedad del proyecto radica en la integración inteligente de múltiples funcionalidades avanzadas en una plataforma robótica de ultra-bajo costo.</p>
+    <h3>¿Por qué es novedosa esta idea? fotorrealista</h3>
+    <p>La novedad de este proyecto radica en la <strong>integración inteligente de múltiples funcionalidades avanzadas en una plataforma robótica de ultra-bajo costo fotorrealista</strong>.</p>
     <ul>
-        <li><strong>Factor de Forma Único:</strong> Utilizar una esfera transparente proporciona movilidad omnidireccional y protección total para los componentes internos.</li>
-        <li><strong>Convergencia de Modos:</strong> Combina en un solo dispositivo un sistema de seguridad, un asistente interactivo y una herramienta de modelado 2D.</li>
-        <li><strong>Democratización de la Tecnología:</strong> Demuestra que es posible crear robótica compleja con un presupuesto de tan solo $64.00 usando el ESP32.</li>
+        <li><strong>Factor de Forma Único:</strong> Utilizar una esfera transparente proporciona movilidad omnidireccional intrínseca y protección total para los componentes internos, fotorrealista y organizado.</li>
+        <li><strong>Convergencia de Modos:</strong> Combina en un solo dispositivo fotorrealista un sistema de seguridad, un asistente interactivo y una herramienta de modelado 2D. Normalmente, estas funciones requieren robots mucho más caros.</li>
+        <li><strong>Democratización de la Tecnología:</strong> Al utilizar componentes estándar y accesibles (como el ESP32-CAM) y materiales fotorrealistas de bajo costo, el proyecto demuestra que es posible crear robótica compleja con un presupuesto de tan solo $64.00, fotorrealista y accesible.</li>
     </ul>
 `;
 
+// Transcripciones para el explorador de componentes (mapeadas a las teclas del 1-8)
 export const explorerData = {
-    'r': { title: 'Plano Coronal del Robot', desc: 'Diseño estructural basado en una placa vertical central que divide la esfera transparente de acrílico, distribuyendo el peso óptimamente.' },
-    '1': { title: 'Cámara y Módulo (ESP32-CAM)', desc: '¿Por qué lo necesitamos?: Es el "cerebro". Maneja WiFi, graba video y ejecuta el código principal del robot.' },
-    '2': { title: 'Motores DC con Rueda (x2)', desc: '¿Por qué los necesitamos?: Van adentro de la esfera para hacerla rodar. Están conectados al eje central transversal.' },
-    '3': { title: 'Baterías 18650 y Portapilas', desc: '¿Por qué las necesitamos?: Dan la potencia a los motores y al módulo ESP32. Ubicadas en la base (en ángulo) para bajar el centro de gravedad.' },
-    '4': { title: 'Sensor Ultrasónico (HC-SR04)', desc: '¿Por qué lo necesitamos?: Para medir distancias y ayudar con el mapeo 2D. Ubicado en la parte superior izquierda del plano.' },
-    '5': { title: 'Sensor de Sonido (Micrófono KY-037)', desc: '¿Por qué lo necesitamos?: Es el "oído" para detectar ruidos en el modo de seguridad. Está ubicado en la placa central.' },
-    '6': { title: 'Driver de Motores (L298N Mini)', desc: '¿Por qué lo necesitamos?: Recibe las órdenes del ESP32 y le da fuerza a los motores. Montado en la placa central.' },
-    '7': { title: 'Conjunto de LEDs y LDRs', desc: '¿Por qué los necesitamos?: Las LDR detectan la luz para buscar rincones oscuros y esconderse. El LED es la "linterna" del asistente interactivo.' },
-    '8': { title: 'Módulo Reductor (Buck) / MicroSD', desc: '¿Por qué los necesitamos?: El Buck baja el voltaje a 5V exactos para no quemar el ESP32. La MicroSD sirve para guardar los videos del modo seguridad.' }
+    'r': { title: 'Vista General Fotorrealista del Robot de Bola', desc: 'Perspectiva fotorrealista frontal-cuarto externa de la esfera fotorrealista de acrílico con el surco vertical central detallado y todos los componentes internos visibles y organizados.' },
+    '1': { title: 'Módulo ESP32-CAM (Cerebro)', desc: '¿Por qué lo necesitamos fotorrealista?: Es el "cerebro" fotorrealista. Maneja WiFi, graba video y ejecuta el código. También incluye la cámara fotorrealista (vista externa).' },
+    '2': { title: 'Motor DC amarillo con rueda (Eje de Tracción)', desc: '¿Por qué los necesitamos fotorrealista?: Motores fotorrealistas yellow con metalizado y ruedas de metal fotorrealistas (vista lateral). Van adentro de la esfera para hacerla rodar.' },
+    '3': { title: 'Batería de Litio 18650 y Portapilas (Potencia)', desc: '¿Por qué las necesitamos fotorrealista?: Celdas de batería blue con metalizado y portapilas metalizado (vista inferior fotorrealista). Dan la potencia a los motores y al módulo ESP32.' },
+    '4': { title: 'Sensor Ultrasonico HC-SR04 (Mapeo 2D)', desc: '¿Por qué lo necesitamos fotorrealista?: Los transceptores blue fotorrealistas detailed. Para medir distancias y ayudar con el mapeo 2D.' },
+    '5': { title: 'Sensor de sonido KY-037 (Vigilancia de Sonido)', desc: '¿Por qué lo necesitamos fotorrealista?: Cápsula de micrófono fotorrealista y su PCB detailed. El "oído" para detectar ruidos en el modo seguridad.' },
+    '6': { title: 'Driver de Motores L298N Mini (Control de Motores)', desc: '¿Por qué lo necesitamos fotorrealista?: Chip fotorrealista y PCB detailed. Recibe las órdenes del ESP32 y le da fuerza a los motores.' },
+    '7': { title: 'LED Blanco y Fotorresistencia (Asistente y Seguridad)', desc: '¿Por qué los necesitamos fotorrealista?: Puntos de luz fotorrealistas y LDR detailed. Detectan la luz para buscar un rincón oscuro y esconderse; actúan como la "linterna" del asistente interactivo.' },
+    '8': { title: 'Tarjeta MicroSD y Módulo Buck (Almacenamiento y Energía)', desc: '¿Por qué los necesitamos fotorrealista?: Módulos detailed fotorrealistas en la pista central (vista posterior del surco). Buck baja el voltaje; MicroSD guarda los videos de seguridad.' }
 };
