@@ -2,11 +2,11 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 let scene, camera, renderer, controls;
-let robotAssembly; 
-let isolatedDisplay; 
+let robotAssembly; // El robot armado completo
+let isolatedDisplay; // Contenedor para mostrar una sola pieza
 let environmentMap;
 
-// Catálogo para guardar la geometría de las 16 piezas
+// Catálogo donde guardamos la geometría de las 16 piezas
 const partsLibrary = {};
 
 export function initThreeJS() {
@@ -30,35 +30,33 @@ export function initThreeJS() {
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
 
-    // Iluminación Profesional
+    // Luces
     scene.add(new THREE.AmbientLight(0xffffff, 0.4));
     const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
     dirLight.position.set(5, 10, 10);
     dirLight.castShadow = true;
     scene.add(dirLight);
-    
+
     const fillLight = new THREE.PointLight(0x00bcd4, 0.5);
     fillLight.position.set(-5, -5, 5);
     scene.add(fillLight);
 
-    // Contenedores principales
+    // Contenedores
     robotAssembly = new THREE.Group();
     scene.add(robotAssembly);
     
     isolatedDisplay = new THREE.Group();
     scene.add(isolatedDisplay);
 
-    // Carga de texturas de entorno para los reflejos del acrílico y metal
     new THREE.CubeTextureLoader()
         .setPath('https://threejs.org/examples/textures/cube/pisa/') 
         .load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'], (texture) => {
             environmentMap = texture;
             environmentMap.mapping = THREE.CubeReflectionMapping;
             scene.environment = environmentMap;
-            buildPartsLibrary(); 
-            assembleRobot();     
+            buildPartsLibrary(); // Crear las 16 piezas primero
+            assembleRobot();     // Luego armar el robot
         }, undefined, () => {
-            // Fallback si no carga el entorno
             buildPartsLibrary();
             assembleRobot();
         });
@@ -71,7 +69,7 @@ export function initThreeJS() {
     });
 }
 
-// 1. MODELAR LAS 16 PIEZAS INDIVIDUALES
+// 1. CREAR LAS 16 PIEZAS INDIVIDUALES
 function buildPartsLibrary() {
     // c1: ESP32-CAM
     const espGroup = new THREE.Group();
@@ -194,15 +192,19 @@ function assembleRobot() {
         robotAssembly.remove(robotAssembly.children[0]);
     }
 
-    // Placa Central Vertical Principal
-    const pcbMain = new THREE.Mesh(new THREE.BoxGeometry(5.8, 5.8, 0.1), new THREE.MeshStandardMaterial({ color: 0x003300, roughness: 0.8 }));
+    // CORRECCIÓN: Placa Central Vertical Principal ahora es un DISCO CIRCULAR
+    // Radio 3.6 para que encaje perfecto dentro de la esfera de radio 3.8
+    const pcbGeo = new THREE.CylinderGeometry(3.6, 3.6, 0.1, 64);
+    const pcbMat = new THREE.MeshStandardMaterial({ color: 0x003300, roughness: 0.8 });
+    const pcbMain = new THREE.Mesh(pcbGeo, pcbMat);
+    pcbMain.rotation.x = Math.PI / 2; // Lo rotamos para que quede vertical
     robotAssembly.add(pcbMain);
 
     // Esfera (c4)
     const esfera = partsLibrary['c4'].clone();
     robotAssembly.add(esfera);
 
-    // Ubicaciones de los componentes en la placa
+    // Ubicaciones de los componentes en la placa circular
     const esp = partsLibrary['c1'].clone(); esp.position.set(1.5, 1.5, 0.15); robotAssembly.add(esp);
     const motorL = partsLibrary['c5'].clone(); motorL.position.set(-1.8, 0, 0); motorL.rotation.z = Math.PI/2; robotAssembly.add(motorL);
     const motorR = partsLibrary['c5'].clone(); motorR.position.set(1.8, 0, 0); motorR.rotation.z = -Math.PI/2; robotAssembly.add(motorR);
