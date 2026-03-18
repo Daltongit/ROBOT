@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prototipo Web - Robot de Bola</title>
+    <title>Dashboard Profesional - Simulación Robot de Bola</title>
     <link rel="stylesheet" href="styles/main.css">
     <script type="importmap">
     {
@@ -15,35 +15,50 @@
     </script>
 </head>
 <body>
+    <div class="simulation-dashboard">
+        <aside class="left-panel">
+            <h3>CONTROLES</h3>
+            <div class="controls-info">
+                <p><strong>Mouse Izq:</strong> Rotar cámara</p>
+                <p><strong>Mouse Der:</strong> Panear cámara</p>
+                <p><strong>Rueda:</strong> Zoom +/-</p>
+                <p><strong>Teclas [1-8]:</strong> Isolar componentes</p>
+                <p><strong>Tecla [R]:</strong> Vista completa</p>
+                <p><strong>Tecla [9]:</strong> Ver Presupuesto ($)</p>
+                <p><strong>Tecla [F]:</strong> Ver Novedad (Idea)</p>
+            </div>
+        </aside>
 
-    <div id="scene-container"></div>
+        <main class="center-panel">
+            <div id="scene-container"></div>
+        </main>
 
-    <div id="component-list-overlay" class="overlay hidden">
-        <div class="overlay-content">
-            <button class="close-btn" id="close-components">&times;</button>
-            <h2>Lista de Componentes y Presupuesto</h2>
-            <div id="components-table-container">
-                </div>
-            <div class="total-cost">Total Estimado: <span id="total-cost-value"></span></div>
-        </div>
+        <aside class="right-panel">
+            <h3>EXPLORADOR DE COMPONENTES</h3>
+            <div class="explorer-content">
+                <h4 id="info-title">Vista General del Robot</h4>
+                <p id="info-desc">Usa el mouse para rotar la esfera o presiona las teclas numéricas para inspeccionar el mecanismo interno fotorrealista.</p>
+            </div>
+            <div class="numeric-keypad">
+                <button class="key active" data-target="r">R</button>
+                <button class="key" data-target="1">1</button>
+                <button class="key" data-target="2">2</button>
+                <button class="key" data-target="3">3</button>
+                <button class="key" data-target="4">4</button>
+                <button class="key" data-target="5">5</button>
+                <button class="key" data-target="6">6</button>
+                <button class="key" data-target="7">7</button>
+                <button class="key" data-target="8">8</button>
+            </div>
+        </aside>
     </div>
 
-    <div id="novelty-overlay" class="overlay hidden">
+    <div id="overlay" class="overlay hidden">
         <div class="overlay-content">
-            <button class="close-btn" id="close-novelty">&times;</button>
-            <h2>Novedad del Proyecto: Robot de Bola</h2>
-            <div id="novelty-text">
+            <button class="close-btn" id="close-overlay">&times;</button>
+            <div id="overlay-body">
                 </div>
         </div>
-    </div>
-
-    <div id="controls-help">
-        <p><strong>Controles:</strong></p>
-        <p>Mouse: Rotar (izq) | Zoom (rueda)</p>
-        <p>Teclas [1-8]: Ver Componentes Individuales</p>
-        <p>Tecla [R]: Reiniciar Vista</p>
-        <p>Tecla [9]: Ver Presupuesto ($)</p>
-        <p>Tecla [F]: Por qué es novedoso</p>
     </div>
 
     <script type="module" src="js/main.js"></script>
