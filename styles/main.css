@@ -1,14 +1,13 @@
 body, html {
     margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #0d1117; color: #c9d1d9; /* Tema Oscuro profesional */
+    background-color: #0d1117; color: #c9d1d9;
 }
 
 .simulation-dashboard {
     display: flex; width: 100%; height: 100%;
 }
 
-/* PANELES LATERALES (TIPO image_3.png) */
 .left-panel, .right-panel {
     width: 300px; padding: 20px;
     background-color: #161b22; border-right: 1px solid #30363d;
@@ -23,15 +22,13 @@ body, html {
 
 #scene-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
 
-/* TIPOGRAFÍA */
 h3 { border-bottom: 2px solid #00bcd4; padding-bottom: 10px; color: #fff; text-align: center; font-size: 1.1rem; letter-spacing: 1px;}
-h4 { color: #00bcd4; margin-top: 20px; }
+h4 { color: #00bcd4; margin-top: 20px; font-size: 1.2rem;}
 
-.controls-info p { margin: 10px 0; font-size: 14px; }
-.controls-info strong { color: #fff; }
-.explorer-content p { font-size: 14px; color: #8b949e; line-height: 1.6; }
+.controls-info p { margin: 15px 0; font-size: 14px; }
+.controls-info strong { color: #fff; display: inline-block; width: 90px;}
+.explorer-content p { font-size: 15px; color: #8b949e; line-height: 1.6; }
 
-/* TECLADO NUMÉRICO (Grid tipo image_3.png) */
 .numeric-keypad {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: auto;
     background-color: #0d1117; padding: 15px; border-radius: 8px; border: 1px solid #30363d;
@@ -48,17 +45,16 @@ h4 { color: #00bcd4; margin-top: 20px; }
 .key[data-target="r"] { grid-column: span 3; background-color: #1a2a4a; border-color: #2a3a5a; }
 .key[data-target="r"]:hover { background-color: #2a3a5a; }
 
-/* OVERLAY (Presupuesto / Novedad) */
 .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 20; display: flex; justify-content: center; align-items: center; opacity: 1; transition: opacity 0.3s; }
 .overlay.hidden { display: none; opacity: 0; pointer-events: none; }
-.overlay-content { background-color: #161b22; padding: 40px; border-radius: 12px; border: 1px solid #30363d; max-width: 800px; max-height: 80vh; overflow-y: auto; position: relative; }
+.overlay-content { background-color: #161b22; padding: 40px; border-radius: 12px; border: 1px solid #30363d; width: 90%; max-width: 900px; max-height: 80vh; overflow-y: auto; position: relative; }
 .close-btn { position: absolute; top: 15px; right: 20px; background: none; border: none; color: #8b949e; font-size: 28px; cursor: pointer; }
 .close-btn:hover { color: #fff; }
 
-/* Estilo de la tabla de Presupuesto */
 #overlay-body table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; color: #eee;}
 #overlay-body th, #overlay-body td { text-align: left; padding: 12px; border-bottom: 1px solid #30363d; }
-#overlay-body th { color: #00bcd4; }
-#overlay-body .total-cost { text-align: right; font-size: 1.2rem; font-weight: bold; color: #00bcd4; margin-top: 20px;}
-#overlay-body ul { color: #ccc; line-height: 1.7; }
-#overlay-body h3 { text-align: left; border-bottom: none; }
+#overlay-body th { color: #00bcd4; background-color: #21262d;}
+#overlay-body .total-cost { text-align: right; font-size: 1.4rem; font-weight: bold; color: #00bcd4; margin-top: 20px;}
+#overlay-body ul { color: #ccc; line-height: 1.7; font-size: 16px;}
+#overlay-body p { font-size: 16px; line-height: 1.6;}
+#overlay-body h3 { text-align: left; border-bottom: none; font-size: 1.8rem; margin-top:0;}
