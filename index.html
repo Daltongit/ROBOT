@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototipo Web - Robot de Bola</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
+</head>
+
+<body>
+
+    <div id="scene-container"></div>
+
+    <div id="component-list-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <button class="close-btn" id="close-components">&times;</button>
+            <h2>Lista de Componentes</h2>
+            <div id="components-table-container">
+            </div>
+            <div class="total-cost">Total Estimado: <span id="total-cost-value"></span></div>
+        </div>
+    </div>
+
+    <div id="novelty-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <button class="close-btn" id="close-novelty">&times;</button>
+            <h2>¿Por qué es novedosa esta idea?</h2>
+            <div id="novelty-text">
+            </div>
+        </div>
+    </div>
+
+    <div id="controls-help">
+        <p><strong>Controles:</strong></p>
+        <p>Mouse: Rotar | Rueda: Zoom</p>
+        <p>Teclas [1-8]: Ver Componentes</p>
+        <p>Tecla [R]: Reiniciar Vista</p>
+        <p>Tecla [9]: Ver Presupuesto</p>
+        <p>Tecla [F]: Ver Novedad</p>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>

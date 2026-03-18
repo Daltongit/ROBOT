@@ -1,0 +1,145 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    /* Evita scroll de la página */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #111;
+    /* Fondo oscuro para el 3D */
+    color: #eee;
+}
+
+/* Contenedor de la escena 3D */
+#scene-container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    /* Fondo */
+}
+
+/* Superposiciones (Overlays) */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    /* Fondo semi-transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    /* Por encima de todo */
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.overlay.hidden {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.overlay-content {
+    background-color: #222;
+    padding: 40px;
+    border-radius: 12px;
+    width: 80%;
+    max-width: 900px;
+    max-height: 80vh;
+    overflow-y: auto;
+    /* Scroll si el contenido es muy largo */
+    position: relative;
+    border: 1px solid #444;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: #fff;
+}
+
+h2 {
+    border-bottom: 2px solid #00bcd4;
+    padding-bottom: 10px;
+    margin-top: 0;
+    color: #00bcd4;
+}
+
+/* Estilos de la tabla de componentes */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th,
+td {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #333;
+}
+
+th {
+    background-color: #333;
+    color: #00bcd4;
+}
+
+.total-cost {
+    text-align: right;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 20px;
+    color: #00bcd4;
+}
+
+/* Texto de novedad */
+#novelty-text {
+    line-height: 1.6;
+    color: #ccc;
+}
+
+#novelty-text p {
+    margin-bottom: 15px;
+}
+
+#novelty-text ul {
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+
+/* Ayuda de controles */
+#controls-help {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 15px;
+    border-radius: 8px;
+    z-index: 5;
+    pointer-events: none;
+    /* No interfiere con el mouse en el 3D */
+    font-size: 0.9em;
+    border: 1px solid #333;
+}
+
+#controls-help p {
+    margin: 5px 0;
+}
