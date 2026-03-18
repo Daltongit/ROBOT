@@ -2,11 +2,10 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 let scene, camera, renderer, controls;
-let robotAssembly; // El robot armado completo
-let isolatedDisplay; // Contenedor para mostrar una sola pieza
+let robotAssembly; 
+let isolatedDisplay; 
 let environmentMap;
 
-// Catálogo donde guardamos la geometría de las 16 piezas
 const partsLibrary = {};
 
 export function initThreeJS() {
@@ -30,18 +29,17 @@ export function initThreeJS() {
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
 
-    // Luces
+    // Iluminación Profesional
     scene.add(new THREE.AmbientLight(0xffffff, 0.4));
     const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
     dirLight.position.set(5, 10, 10);
     dirLight.castShadow = true;
     scene.add(dirLight);
-
+    
     const fillLight = new THREE.PointLight(0x00bcd4, 0.5);
     fillLight.position.set(-5, -5, 5);
     scene.add(fillLight);
 
-    // Contenedores
     robotAssembly = new THREE.Group();
     scene.add(robotAssembly);
     
@@ -54,8 +52,8 @@ export function initThreeJS() {
             environmentMap = texture;
             environmentMap.mapping = THREE.CubeReflectionMapping;
             scene.environment = environmentMap;
-            buildPartsLibrary(); // Crear las 16 piezas primero
-            assembleRobot();     // Luego armar el robot
+            buildPartsLibrary(); 
+            assembleRobot();     
         }, undefined, () => {
             buildPartsLibrary();
             assembleRobot();
@@ -69,7 +67,7 @@ export function initThreeJS() {
     });
 }
 
-// 1. CREAR LAS 16 PIEZAS INDIVIDUALES
+// 1. MODELAR LAS 16 PIEZAS INDIVIDUALES
 function buildPartsLibrary() {
     // c1: ESP32-CAM
     const espGroup = new THREE.Group();
@@ -93,16 +91,30 @@ function buildPartsLibrary() {
     sdGroup.add(sdCard);
     partsLibrary['c3'] = sdGroup;
 
-    // c4: Esfera Acrílico
-    const sphereMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transmission: 1, opacity: 1, roughness: 0.1, clearcoat: 1, transparent: true });
-    partsLibrary['c4'] = new THREE.Mesh(new THREE.SphereGeometry(3.8, 64, 64), sphereMat);
+    // c4: Esfera Acrílico (AHORA DIVIDIDA EN DOS MITADES CON SURCO CENTRAL)
+    const sphereGroup = new THREE.Group();
+    const sphereMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transmission: 1, opacity: 1, roughness: 0.1, clearcoat: 1, transparent: true, side: THREE.DoubleSide });
+    // Mitad Derecha (dejamos un gap de 0.05 para el surco)
+    const hemiR = new THREE.Mesh(new THREE.SphereGeometry(3.8, 64, 64, 0, Math.PI*2, 0, Math.PI/2 - 0.05), sphereMat);
+    hemiR.rotation.z = -Math.PI/2;
+    // Mitad Izquierda
+    const hemiL = new THREE.Mesh(new THREE.SphereGeometry(3.8, 64, 64, 0, Math.PI*2, 0, Math.PI/2 - 0.05), sphereMat);
+    hemiL.rotation.z = Math.PI/2;
+    sphereGroup.add(hemiR, hemiL);
+    partsLibrary['c4'] = sphereGroup;
 
-    // c5: Motor Amarillo
+    // c5: Motor Amarillo (AHORA CON EJE Y ACOPLE PARA LA ESFERA)
     const motorGroup = new THREE.Group();
     const motorBody = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.6), new THREE.MeshStandardMaterial({color: 0xffcc00}));
-    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.2, 32), new THREE.MeshStandardMaterial({color: 0x222222}));
-    wheel.rotation.z = Math.PI/2; wheel.position.x = 0.5;
-    motorGroup.add(motorBody, wheel);
+    // Eje de transmisión de metal
+    const axle = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1.8, 16), new THREE.MeshStandardMaterial({color: 0xcccccc, metalness: 0.8}));
+    axle.rotation.z = Math.PI/2;
+    axle.position.x = 0.9;
+    // Acople (Hub) que se pega a la esfera interna
+    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.1, 32), new THREE.MeshStandardMaterial({color: 0x222222}));
+    hub.rotation.z = Math.PI/2;
+    hub.position.x = 1.8; // Llega exactamente al radio interno de la esfera
+    motorGroup.add(motorBody, axle, hub);
     partsLibrary['c5'] = motorGroup;
 
     // c6: Driver L298N
@@ -185,29 +197,30 @@ function buildPartsLibrary() {
     partsLibrary['c16'] = switchGroup;
 }
 
-// 2. ENSAMBLAR EL ROBOT CON LAS 16 PIEZAS DE LA LIBRERÍA
+// 2. ENSAMBLAR EL ROBOT
 function assembleRobot() {
-    // Limpiar si ya existe
     while(robotAssembly.children.length > 0) {
         robotAssembly.remove(robotAssembly.children[0]);
     }
 
-    // CORRECCIÓN: Placa Central Vertical Principal ahora es un DISCO CIRCULAR
-    // Radio 3.6 para que encaje perfecto dentro de la esfera de radio 3.8
+    // Placa Central Vertical (Disco)
     const pcbGeo = new THREE.CylinderGeometry(3.6, 3.6, 0.1, 64);
     const pcbMat = new THREE.MeshStandardMaterial({ color: 0x003300, roughness: 0.8 });
     const pcbMain = new THREE.Mesh(pcbGeo, pcbMat);
-    pcbMain.rotation.x = Math.PI / 2; // Lo rotamos para que quede vertical
+    pcbMain.rotation.x = Math.PI / 2; 
     robotAssembly.add(pcbMain);
 
-    // Esfera (c4)
+    // Esfera (c4) - Ahora son dos hemisferios visibles
     const esfera = partsLibrary['c4'].clone();
     robotAssembly.add(esfera);
 
-    // Ubicaciones de los componentes en la placa circular
+    // Ubicaciones de los componentes en la placa
     const esp = partsLibrary['c1'].clone(); esp.position.set(1.5, 1.5, 0.15); robotAssembly.add(esp);
-    const motorL = partsLibrary['c5'].clone(); motorL.position.set(-1.8, 0, 0); motorL.rotation.z = Math.PI/2; robotAssembly.add(motorL);
-    const motorR = partsLibrary['c5'].clone(); motorR.position.set(1.8, 0, 0); motorR.rotation.z = -Math.PI/2; robotAssembly.add(motorR);
+    
+    // Motores con los ejes extendidos apuntando hacia afuera
+    const motorL = partsLibrary['c5'].clone(); motorL.position.set(-1.8, 0, 0); motorL.rotation.y = Math.PI; robotAssembly.add(motorL);
+    const motorR = partsLibrary['c5'].clone(); motorR.position.set(1.8, 0, 0); robotAssembly.add(motorR);
+    
     const driver = partsLibrary['c6'].clone(); driver.position.set(1, -0.8, 0.15); robotAssembly.add(driver);
     const ultra = partsLibrary['c7'].clone(); ultra.position.set(-1.5, 1.8, 0.15); robotAssembly.add(ultra);
     const mic = partsLibrary['c8'].clone(); mic.position.set(-1, 0.8, 0.15); robotAssembly.add(mic);
@@ -218,10 +231,10 @@ function assembleRobot() {
     const bat1 = partsLibrary['c11'].clone(); bat1.position.set(-0.4, -2, 0.5); robotAssembly.add(bat1);
     const bat2 = partsLibrary['c11'].clone(); bat2.position.set(0.4, -2, 0.5); robotAssembly.add(bat2);
     const buck = partsLibrary['c13'].clone(); buck.position.set(-1, -1, 0.15); robotAssembly.add(buck);
-    const proto = partsLibrary['c15'].clone(); proto.position.set(0, 0, -0.2); robotAssembly.add(proto); // Atrás
+    const proto = partsLibrary['c15'].clone(); proto.position.set(0, 0, -0.2); robotAssembly.add(proto); 
     const switchBtn = partsLibrary['c16'].clone(); switchBtn.position.set(0, 2.8, 0.15); robotAssembly.add(switchBtn);
-    const ftdi = partsLibrary['c2'].clone(); ftdi.position.set(-1.5, -0.5, -0.2); robotAssembly.add(ftdi); // Atrás
-    const sd = partsLibrary['c3'].clone(); sd.position.set(1.5, 0.5, -0.2); robotAssembly.add(sd); // Atrás
+    const ftdi = partsLibrary['c2'].clone(); ftdi.position.set(-1.5, -0.5, -0.2); robotAssembly.add(ftdi); 
+    const sd = partsLibrary['c3'].clone(); sd.position.set(1.5, 0.5, -0.2); robotAssembly.add(sd); 
     const cables = partsLibrary['c14'].clone(); cables.position.set(0, 0, 0.15); robotAssembly.add(cables);
 }
 
@@ -236,17 +249,14 @@ export function isolateComponent(id) {
         camera.position.set(8, 5, 8);
         controls.target.set(0, 0, 0);
     } else {
-        // Ocultar el ensamble completo
         robotAssembly.visible = false;
         
-        // Cargar pieza solicitada
         if (partsLibrary[id]) {
             const piece = partsLibrary[id].clone();
             piece.position.set(0,0,0);
             piece.rotation.set(0,0,0);
             isolatedDisplay.add(piece);
 
-            // Zoom a la pieza individual
             camera.position.set(0, 1.5, 4);
             controls.target.set(0, 0, 0);
         }
@@ -258,7 +268,6 @@ export function animateThreeJS() {
     requestAnimationFrame(animateThreeJS);
     controls.update();
     
-    // Animación de rotación solo para la pieza aislada
     if(!robotAssembly.visible && isolatedDisplay.children.length > 0) {
         isolatedDisplay.rotation.y += 0.01;
     } else {
