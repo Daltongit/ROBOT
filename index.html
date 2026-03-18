@@ -22,34 +22,26 @@
                 <p><strong>Mouse Izq:</strong> Rotar cámara</p>
                 <p><strong>Mouse Der:</strong> Panear cámara</p>
                 <p><strong>Rueda:</strong> Zoom +/-</p>
-                <p><strong>Teclas [1-8]:</strong> Isolar componentes</p>
-                <p><strong>Tecla [R]:</strong> Vista completa</p>
-                <p><strong>Tecla [9]:</strong> Ver Presupuesto ($)</p>
-                <p><strong>Tecla [F]:</strong> Ver Novedad (Idea)</p>
+                <p><strong>Menú Derecho:</strong> Clic para aislar pieza</p>
+                <br>
+                <button class="action-btn" id="btn-reset">Ver Robot Completo</button>
+                <button class="action-btn" id="btn-budget">Ver Presupuesto ($)</button>
+                <button class="action-btn" id="btn-novelty">Ver Novedad (Idea)</button>
             </div>
         </aside>
 
         <main class="center-panel">
             <div id="scene-container"></div>
+            <div id="floating-title" class="hidden">Nombre de la Pieza</div>
         </main>
 
         <aside class="right-panel">
-            <h3>EXPLORADOR DE COMPONENTES</h3>
+            <h3>LISTA DE COMPONENTES</h3>
             <div class="explorer-content">
-                <h4 id="info-title">Vista General del Robot</h4>
-                <p id="info-desc">Usa el mouse para rotar la esfera o presiona las teclas numéricas para inspeccionar el mecanismo interno fotorrealista.</p>
+                <p id="info-desc">Haz clic en cualquier componente de la lista inferior para extraerlo de la esfera y examinarlo en detalle.</p>
             </div>
-            <div class="numeric-keypad">
-                <button class="key active" data-target="r">R</button>
-                <button class="key" data-target="1">1</button>
-                <button class="key" data-target="2">2</button>
-                <button class="key" data-target="3">3</button>
-                <button class="key" data-target="4">4</button>
-                <button class="key" data-target="5">5</button>
-                <button class="key" data-target="6">6</button>
-                <button class="key" data-target="7">7</button>
-                <button class="key" data-target="8">8</button>
-            </div>
+            <div class="component-list" id="component-list">
+                </div>
         </aside>
     </div>
 
