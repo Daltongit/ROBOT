@@ -1,5 +1,5 @@
-import { initThreeJS, animateThreeJS, setViewModel } from './modelView.js';
-import { budgetData, noveltyText, explorerData } from './data.js';
+import { initThreeJS, animateThreeJS, isolateComponent } from './modelView.js';
+import { componentsList, budgetTotal, noveltyText } from './data.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initThreeJS();
@@ -8,102 +8,74 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupDashboardUI() {
-    const keys = document.querySelectorAll('.key');
-    const infoTitle = document.getElementById('info-title');
-    const infoDesc = document.getElementById('info-desc');
+    const listContainer = document.getElementById('component-list');
+    const descText = document.getElementById('info-desc');
+    const floatingTitle = document.getElementById('floating-title');
     const overlay = document.getElementById('overlay');
     const overlayBody = document.getElementById('overlay-body');
-    const closeBtn = document.getElementById('close-overlay');
 
-    // Inicializar el texto con la vista completa R
-    infoTitle.textContent = explorerData['r'].title;
-    infoDesc.textContent = explorerData['r'].desc;
-
-    // Función unificada para cambiar de vista (isolar componentes)
-    const changeView = (key) => {
-        const dataKey = key.toLowerCase();
+    // 1. GENERAR LOS 16 BOTONES DINÁMICAMENTE DESDE LA DATA
+    componentsList.forEach((comp) => {
+        const btn = document.createElement('div');
+        btn.className = 'comp-item';
+        btn.dataset.id = comp.id;
+        btn.innerHTML = `<strong>${comp.name}</strong>`;
         
-        // Actualizar Teclado Numérico
-        keys.forEach(k => k.classList.remove('active'));
-        const targetBtn = document.querySelector(`.key[data-target="${dataKey}"]`);
-        if(targetBtn) targetBtn.classList.add('active');
+        // Evento click
+        btn.addEventListener('click', () => {
+            // Estilo visual del botón
+            document.querySelectorAll('.comp-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
 
-        // Actualizar Textos del Explorador (js/data.js)
-        if(explorerData[dataKey]) {
-            infoTitle.textContent = explorerData[dataKey].title;
-            infoDesc.innerHTML = explorerData[dataKey].desc; // Use innerHTML to allow "¿Por qué lo necesitamos?" formatting
-        }
+            // Actualizar panel y título flotante
+            descText.innerHTML = `<strong style="color:#00bcd4;">Función:</strong> ${comp.func}`;
+            floatingTitle.textContent = comp.name;
+            floatingTitle.classList.remove('hidden');
 
-        // Mover Cámara (Movimiento directo profesional)
-        setViewModel(dataKey);
-        
-        // Ocultar overlays si se presiona una tecla de vista
-        overlay.classList.add('hidden');
-    };
-
-    // CLICKS EN TECLADO DEL DASHBOARD
-    keys.forEach(key => {
-        key.addEventListener('click', (e) => changeView(e.target.getAttribute('data-target')));
-    });
-
-    // TECLADO FÍSICO CONTROLS
-    document.addEventListener('keydown', (event) => {
-        const key = event.key.toLowerCase();
-        
-        // Cambios de Vista [1-8, R]
-        if(['1','2','3','4','5','6','7','8','r'].includes(key)) {
-            changeView(key);
-        }
-        // Overlays [9, F, Escape]
-        else if(key === '9') {
-            showBudgetOverlay();
-        } else if(key === 'f') {
-            showNoveltyOverlay();
-        } else if(key === 'escape') {
+            // Llamar a Three.js para ocultar el robot y mostrar la pieza
+            isolateComponent(comp.id);
             overlay.classList.add('hidden');
-        }
+        });
+
+        listContainer.appendChild(btn);
     });
 
-    // Lógica de Overlays profesionales
-    closeBtn.addEventListener('click', () => overlay.classList.add('hidden'));
+    // 2. BOTÓN DE VER ROBOT COMPLETO
+    document.getElementById('btn-reset').addEventListener('click', () => {
+        document.querySelectorAll('.comp-item').forEach(b => b.classList.remove('active'));
+        descText.textContent = "Haz clic en cualquier componente de la lista inferior para extraerlo de la esfera y examinarlo en detalle.";
+        floatingTitle.classList.add('hidden');
+        isolateComponent('reset');
+        overlay.classList.add('hidden');
+    });
 
-    function showBudgetOverlay() {
-        // Generar tabla fotorrealista (datos completas de Excel image_11.png en js/data.js)
+    // 3. BOTÓN DE PRESUPUESTO
+    document.getElementById('btn-budget').addEventListener('click', () => {
         let tableHTML = `
-            <h3>Lista de Componentes y Presupuesto Fotorrealista Detailed</h3>
+            <h3 style="border:none; text-align:left; font-size:1.8rem; margin-top:0; color:#00bcd4;">Presupuesto de 16 Componentes</h3>
             <table>
                 <thead>
-                    <tr>
-                        <th>Componente</th>
-                        <th>Cantidad</th>
-                        <th>Precio Unit.</th>
-                        <th>Total</th>
-                    </tr>
+                    <tr><th>Componente</th><th>Cant.</th><th>Total</th></tr>
                 </thead>
                 <tbody>
         `;
-        budgetData.items.forEach(item => {
-            tableHTML += `
-                <tr>
-                    <td>${item.item}</td>
-                    <td>${item.qty}</td>
-                    <td>${item.cost}</td>
-                    <td>${item.total}</td>
-                </tr>
-            `;
+        componentsList.forEach(c => {
+            tableHTML += `<tr><td>${c.name}</td><td>${c.qty}</td><td>${c.total}</td></tr>`;
         });
-        tableHTML += `
-                </tbody>
-            </table>
-            <div class="total-cost">Total Estimado Fotorrealista Detailed: ${budgetData.total}</div>
-        `;
+        tableHTML += `</tbody></table><div class="total-cost">Total Estimado: ${budgetTotal}</div>`;
+        
         overlayBody.innerHTML = tableHTML;
         overlay.classList.remove('hidden');
-    }
+    });
 
-    function showNoveltyOverlay() {
-        // Cargar texto de novedad fotorrealista detailed (js/data.js)
+    // 4. BOTÓN DE NOVEDAD
+    document.getElementById('btn-novelty').addEventListener('click', () => {
         overlayBody.innerHTML = noveltyText;
         overlay.classList.remove('hidden');
-    }
+    });
+
+    // CERRAR OVERLAYS
+    document.getElementById('close-overlay').addEventListener('click', () => {
+        overlay.classList.add('hidden');
+    });
 }
