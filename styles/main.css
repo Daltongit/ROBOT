@@ -1,145 +1,128 @@
-body,
-html {
+/* styles.css */
+body, html {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    /* Evita scroll de la página */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #111;
-    /* Fondo oscuro para el 3D */
-    color: #eee;
+    background-color: #1a1a1a; /* Fondo fotorrealista oscuro */
+    color: #e0e0e0;
+    font-family: 'Arial', sans-serif;
 }
 
-/* Contenedor de la escena 3D */
-#scene-container {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    /* Fondo */
-}
-
-/* Superposiciones (Overlays) */
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.85);
-    /* Fondo semi-transparente */
+.simulation-view {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-    /* Por encima de todo */
-    opacity: 1;
-    transition: opacity 0.3s ease;
+    width: 100%;
+    height: 100%;
+    background-image: url('metal-grid-texture.png'); /* Textura fotorrealista de rejilla metálica */
+    background-size: cover;
+    background-position: center;
 }
 
-.overlay.hidden {
-    display: none;
-    opacity: 0;
+.viewer-panel {
+    flex: 2;
+    position: relative;
+    border-right: 2px solid #333; /* Borde fotorrealista oscuro */
+}
+
+.explorer-panel {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+#main-3d-container, #isolated-3d-container {
+    width: 100%;
+    height: 100%;
+}
+
+.label {
+    position: absolute;
+    display: flex;
+    align-items: center;
     pointer-events: none;
 }
 
-.overlay-content {
-    background-color: #222;
-    padding: 40px;
-    border-radius: 12px;
-    width: 80%;
-    max-width: 900px;
-    max-height: 80vh;
-    overflow-y: auto;
-    /* Scroll si el contenido es muy largo */
-    position: relative;
-    border: 1px solid #444;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+.label-line {
+    width: 30px;
+    height: 2px;
+    background-color: #80cbc4; /* Color fotorrealista de la línea indicadora */
+    margin-right: 10px;
 }
 
-.close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    background: none;
-    border: none;
-    color: #888;
-    font-size: 30px;
-    cursor: pointer;
+.photorealistic-label {
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8); /* Efecto fotorrealista */
 }
 
-.close-btn:hover {
-    color: #fff;
-}
+/* Estilos específicos de etiquetas con líneas indicadoras */
+.motors-line { transform: rotate(10deg); }
+.camera-line { transform: rotate(-20deg); }
+.batteries-line { transform: rotate(-5deg); }
+.ultrasonic-line { transform: rotate(-10deg); width: 40px; }
 
-h2 {
-    border-bottom: 2px solid #00bcd4;
-    padding-bottom: 10px;
-    margin-top: 0;
-    color: #00bcd4;
-}
+.isolated-title-line { transform: rotate(0deg); }
+.isolated-pcb-line { transform: rotate(-30deg); }
+.isolated-lens-line { transform: rotate(30deg); width: 40px; }
+.isolated-esp32-line { transform: rotate(0deg); width: 40px; }
 
-/* Estilos de la tabla de componentes */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-th,
-td {
-    text-align: left;
-    padding: 12px;
-    border-bottom: 1px solid #333;
-}
-
-th {
-    background-color: #333;
-    color: #00bcd4;
-}
-
-.total-cost {
-    text-align: right;
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-top: 20px;
-    color: #00bcd4;
-}
-
-/* Texto de novedad */
-#novelty-text {
-    line-height: 1.6;
-    color: #ccc;
-}
-
-#novelty-text p {
-    margin-bottom: 15px;
-}
-
-#novelty-text ul {
-    margin-left: 20px;
-    margin-bottom: 15px;
-}
-
-/* Ayuda de controles */
-#controls-help {
+.controls-panel {
     position: absolute;
     bottom: 20px;
     left: 20px;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.7);
     padding: 15px;
     border-radius: 8px;
-    z-index: 5;
-    pointer-events: none;
-    /* No interfiere con el mouse en el 3D */
-    font-size: 0.9em;
-    border: 1px solid #333;
+    border: 1px solid #444;
 }
 
-#controls-help p {
+.photorealistic-controls h3, .photorealistic-controls p {
     margin: 5px 0;
+    font-size: 14px;
+    color: #b0bec5;
+}
+
+.photorealistic-title {
+    text-align: center;
+    color: #fff;
+    font-size: 18px;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.numeric-keypad {
+    position: absolute;
+    bottom: 30px;
+    left: 20px;
+    right: 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: rgba(30, 30, 30, 0.6);
+}
+
+.key {
+    background-color: #333;
+    border: 2px solid #444;
+    color: #e0e0e0;
+    font-size: 20px;
+    padding: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.key:hover {
+    background-color: #444;
+}
+
+.active-key {
+    background-color: rgba(128, 203, 196, 0.3); /* Resplandor fotorrealista sutil */
+    border-color: #80cbc4;
+    box-shadow: 0 0 10px #80cbc4;
+    color: #fff;
 }
