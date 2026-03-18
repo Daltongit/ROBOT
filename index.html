@@ -1,79 +1,51 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulación Web de Robot de Bola Robótico Fotorrealista</title>
-<link rel="stylesheet" href="styles.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototipo Web - Robot de Bola</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
 </head>
 <body>
-    <div class="simulation-view">
-        <div id="main-viewer" class="viewer-panel">
-            <div id="main-3d-container"></div>
-            <div class="label photorealistic-label motors-label" style="top: 25%; left: 30%;">
-                <div class="label-line motors-line"></div>
-                <div class="label-text">Motores DC de Metal Fotorrealistas (Simétricos)</div>
-            </div>
-            <div class="label photorealistic-label camera-label" style="top: 45%; left: 20%;">
-                <div class="label-line camera-line"></div>
-                <div class="label-text">Cámara ESP32-CAM Profesional</div>
-            </div>
-            <div class="label photorealistic-label batteries-label" style="top: 70%; left: 15%;">
-                <div class="label-line batteries-line"></div>
-                <div class="label-text">Baterías 18650 Fotorrealistas</div>
-            </div>
-            <div class="label photorealistic-label ultrasonic-label" style="top: 85%; left: 75%;">
-                <div class="label-line ultrasonic-line"></div>
-                <div class="label-text">Módulo Ultrasónico HC-SR04 Detallado</div>
-            </div>
 
-            <div class="controls-panel photorealistic-controls">
-                <h3>Controles:</h3>
-                <p>Mouse: Rotar | Rueda: Zoom</p>
-                <p>Teclas [1-8]: Ver Componentes</p>
-                <p>Tecla [R]: Reiniciar Vista</p>
-                <p>Tecla [9]: Ver Presupuesto</p>
-                <p>Tecla [F]: Ver Novedad</p>
-            </div>
-        </div>
+    <div id="scene-container"></div>
 
-        <div id="component-explorer" class="explorer-panel">
-            <h2 class="photorealistic-title">EXPLORADOR DE COMPONENTES (ESTADO SIMULADO)</h2>
-            <div id="isolated-3d-container"></div>
-            <div id="isolated-labels" class="isolated-labels-active">
-                <div class="label photorealistic-label isolated-title-label" style="top: 15%; left: 15%;">
-                    <div class="label-line isolated-title-line"></div>
-                    <div class="label-text">2. MÓDULO ESP32-CAM Y LENTE (Simulación Tecla [2])</div>
+    <div id="component-list-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <button class="close-btn" id="close-components">&times;</button>
+            <h2>Lista de Componentes y Presupuesto</h2>
+            <div id="components-table-container">
                 </div>
-                <div class="label photorealistic-label isolated-pcb-label" style="top: 30%; left: 5%;">
-                    <div class="label-line isolated-pcb-line"></div>
-                    <div class="label-text">Placa base PCB (Azul real)</div>
-                </div>
-                <div class="label photorealistic-label isolated-lens-label" style="top: 30%; right: 5%;">
-                    <div class="label-line isolated-lens-line"></div>
-                    <div class="label-text">Cámara fotorrealista (Vidrio y iris)</div>
-                </div>
-                <div class="label photorealistic-label isolated-esp32-label" style="top: 65%; right: 15%;">
-                    <div class="label-line isolated-esp32-line"></div>
-                    <div class="label-text">Microcontrolador ESP32</div>
-                </div>
-            </div>
-
-            <div class="numeric-keypad photorealistic-keypad">
-                <button class="key">1</button>
-                <button id="key-2" class="key active-key">2</button>
-                <button class="key">3</button>
-                <button class="key">4</button>
-                <button class="key">5</button>
-                <button class="key">6</button>
-                <button class="key">7</button>
-                <button class="key">8</button>
-            </div>
+            <div class="total-cost">Total Estimado: <span id="total-cost-value"></span></div>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <div id="novelty-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <button class="close-btn" id="close-novelty">&times;</button>
+            <h2>Novedad del Proyecto: Robot de Bola</h2>
+            <div id="novelty-text">
+                </div>
+        </div>
+    </div>
+
+    <div id="controls-help">
+        <p><strong>Controles:</strong></p>
+        <p>Mouse: Rotar (izq) | Zoom (rueda)</p>
+        <p>Teclas [1-8]: Ver Componentes Individuales</p>
+        <p>Tecla [R]: Reiniciar Vista</p>
+        <p>Tecla [9]: Ver Presupuesto ($)</p>
+        <p>Tecla [F]: Por qué es novedoso</p>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
