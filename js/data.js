@@ -1,6 +1,6 @@
 // js/data.js
 
-// 1. Datos del Presupuesto y Componentes (Extraídos de la imagen 2)
+// 1. Datos del Presupuesto y Componentes (Extraídos de la imagen 6)
 export const componentsData = {
     total: "$64.00",
     items: [
